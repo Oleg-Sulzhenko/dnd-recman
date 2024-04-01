@@ -1,11 +1,11 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, memo } from "react";
 import { createPortal } from "react-dom";
 import {
   DndContext,
-  DragEndEvent,
-  DragOverEvent,
-  DragOverlay,
-  DragStartEvent,
+  type DragEndEvent,
+  type DragOverEvent,
+  // DragOverlay,
+  type DragStartEvent,
   PointerSensor,
   useSensor,
   useSensors,
@@ -14,21 +14,22 @@ import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 
 import PlusIcon from "../icons/PlusIcon";
 import { Column, Id, Task } from "../types";
-import ColumnContainer from "./ColumnContainer";
-import TaskCard from "./TaskCard";
+import { Sortable } from "./Sortable";
+// import ColumnContainer from "./ColumnContainer";
+// import TaskCard from "./TaskCard";
 
 const defaultCols: Column[] = [
   {
     id: "todo",
     title: "Todo",
   },
-  {
-    id: "doing",
-    title: "Work in progress",
-  },
+  // {
+  //   id: "doing",
+  //   title: "Progress",
+  // },
   {
     id: "done",
-    title: "Done",
+    title: "NO RENDER PLEASE",
   },
 ];
 
@@ -36,72 +37,76 @@ const defaultTasks: Task[] = [
   {
     id: "1",
     columnId: "todo",
-    content: "List admin APIs for dashboard",
+    // content: "List admin APIs for dashboard",
+    content: "Todo 1",
   },
   {
     id: "2",
-    columnId: "todo",
+    columnId: "done",
     content:
-      "Develop user registration functionality with OTP delivered on SMS after email confirmation and phone number confirmation",
+      // "Develop user registration functionality with OTP delivered on SMS after email confirmation and phone number confirmation",
+      "Done 1",
   },
   {
     id: "3",
     columnId: "doing",
-    content: "Conduct security testing",
+    // content: "Conduct security testing",
+    content: "Progress 1",
   },
-  {
-    id: "4",
-    columnId: "doing",
-    content: "Analyze competitors",
-  },
-  {
-    id: "5",
-    columnId: "done",
-    content: "Create UI kit documentation",
-  },
-  {
-    id: "6",
-    columnId: "done",
-    content: "Dev meeting",
-  },
-  {
-    id: "7",
-    columnId: "done",
-    content: "Deliver dashboard prototype",
-  },
-  {
-    id: "8",
-    columnId: "todo",
-    content: "Optimize application performance",
-  },
-  {
-    id: "9",
-    columnId: "todo",
-    content: "Implement data validation",
-  },
-  {
-    id: "10",
-    columnId: "todo",
-    content: "Design database schema",
-  },
-  {
-    id: "11",
-    columnId: "todo",
-    content: "Integrate SSL web certificates into workflow",
-  },
-  {
-    id: "12",
-    columnId: "doing",
-    content: "Implement error logging and monitoring",
-  },
-  {
-    id: "13",
-    columnId: "doing",
-    content: "Design and implement responsive UI",
-  },
+  // {
+  //   id: "4",
+  //   columnId: "doing",
+  //   content: "Analyze competitors",
+  // },
+  // {
+  //   id: "5",
+  //   columnId: "done",
+  //   content: "Create UI kit documentation",
+  // },
+  // {
+  //   id: "6",
+  //   columnId: "done",
+  //   content: "Dev meeting",
+  // },
+  // {
+  //   id: "7",
+  //   columnId: "done",
+  //   content: "Deliver dashboard prototype",
+  // },
+  // {
+  //   id: "8",
+  //   columnId: "todo",
+  //   content: "Optimize application performance",
+  // },
+  // {
+  //   id: "9",
+  //   columnId: "todo",
+  //   content: "Implement data validation",
+  // },
+  // {
+  //   id: "10",
+  //   columnId: "todo",
+  //   content: "Design database schema",
+  // },
+  // {
+  //   id: "11",
+  //   columnId: "todo",
+  //   content: "Integrate SSL web certificates into workflow",
+  // },
+  // {
+  //   id: "12",
+  //   columnId: "doing",
+  //   content: "Implement error logging and monitoring",
+  // },
+  // {
+  //   id: "13",
+  //   columnId: "doing",
+  //   content: "Design and implement responsive UI",
+  // },
 ];
 
 function KanbanBoard() {
+  console.log('<<<KANBAN>>>')
   const [columns, setColumns] = useState<Column[]>(defaultCols);
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
@@ -141,11 +146,9 @@ function KanbanBoard() {
         <div className="m-auto flex gap-4">
 
           <div className="flex gap-4">
-
             <SortableContext items={columnsId}>
               {columns.map((col) => (
-                <ColumnContainer
-                  key={col.id}
+                <Sortable key={col.id}
                   column={col}
                   deleteColumn={deleteColumn}
                   updateColumn={updateColumn}
@@ -156,9 +159,9 @@ function KanbanBoard() {
                 />
               ))}
             </SortableContext>
-
           </div>
 
+          {/* Add Column Button */}
           <button
             onClick={() => {
               createNewColumn();
@@ -184,7 +187,7 @@ function KanbanBoard() {
           </button>
         </div>
 
-        {createPortal(
+        {/* {createPortal(
           <DragOverlay>
 
             {activeColumn && (
@@ -211,7 +214,8 @@ function KanbanBoard() {
             
           </DragOverlay>,
           document.body
-        )}
+        )} */}
+
       </DndContext>
     </div>
   );
