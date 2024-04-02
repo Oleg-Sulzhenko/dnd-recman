@@ -1,10 +1,10 @@
-import { useMemo, useState, memo } from "react";
+import { useMemo, useState, memo, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
   DndContext,
   type DragEndEvent,
   type DragOverEvent,
-  // DragOverlay,
+  DragOverlay,
   type DragStartEvent,
   PointerSensor,
   useSensor,
@@ -14,9 +14,10 @@ import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 
 import PlusIcon from "../icons/PlusIcon";
 import { Column, Id, Task } from "../types";
-import { Sortable } from "./Sortable";
-// import ColumnContainer from "./ColumnContainer";
-// import TaskCard from "./TaskCard";
+import SortableColumn  from "../components/SortableColumn";
+import ColumnContainer from "../components/ColumnContainer";
+import TaskCard from "../components/TaskCard";
+import useLocalStorage from "../hooks/useBoardData";
 
 const defaultCols: Column[] = [
   {
@@ -45,7 +46,7 @@ const defaultTasks: Task[] = [
     columnId: "done",
     content:
       // "Develop user registration functionality with OTP delivered on SMS after email confirmation and phone number confirmation",
-      "Done 1",
+      "NO RENDER PLEASE",
   },
   {
     id: "3",
@@ -107,6 +108,7 @@ const defaultTasks: Task[] = [
 
 function KanbanBoard() {
   console.log('<<<KANBAN>>>')
+  // const [columns, setColumns] = useLocalStorage('columns');
   const [columns, setColumns] = useState<Column[]>(defaultCols);
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
@@ -123,6 +125,51 @@ function KanbanBoard() {
       },
     })
   );
+
+  
+  const createNewColumn = useCallback(() => {
+    setColumns((prevColumns) => {
+      const columnToAdd: Column = {
+        id: generateId(),
+        title: `Column ${prevColumns.length + 1}`,
+      };
+      return [...prevColumns, columnToAdd]
+    })
+  }, []);
+  
+  const updateColumn = useCallback((id: Id, title: string) => {
+    setColumns((prevColumns) => {
+      const newColumns = prevColumns.map((col) => {
+        if (col.id !== id) return col;
+        return { ...col, title };
+      });
+      return newColumns;
+    })
+  }, []);
+
+  const deleteColumn = useCallback((id: Id) => {
+    setColumns((prevColumns) => {
+      const filteredColumns = prevColumns.filter((col) => col.id !== id);
+      return filteredColumns;
+    });
+
+    // !!!
+    // const newTasks = tasks.filter((t) => t.columnId !== id);
+    // setTasks(newTasks);
+  }, []);
+
+
+  const createTask = useCallback((columnId: Id) => {
+    setTasks((prevTasks) => {
+      const newTask: Task = {
+        id: generateId(),
+        columnId,
+        content: `Task ${prevTasks.length + 1}`,
+      };
+      return [...prevTasks, newTask]
+    });
+  }, []);
+ 
 
   return (
     <div
@@ -148,13 +195,13 @@ function KanbanBoard() {
           <div className="flex gap-4">
             <SortableContext items={columnsId}>
               {columns.map((col) => (
-                <Sortable key={col.id}
+                <SortableColumn key={col.id}
                   column={col}
                   deleteColumn={deleteColumn}
                   updateColumn={updateColumn}
-                  createTask={createTask}
-                  deleteTask={deleteTask}
-                  updateTask={updateTask}
+                  // createTask={createTask}
+                  // deleteTask={deleteTask}
+                  // updateTask={updateTask}
                   tasks={tasks.filter((task) => task.columnId === col.id)}
                 />
               ))}
@@ -162,36 +209,14 @@ function KanbanBoard() {
           </div>
 
           {/* Add Column Button */}
-          <button
-            onClick={() => {
-              createNewColumn();
-            }}
-            className="
-              h-[60px]
-              w-[350px]
-              min-w-[350px]
-              cursor-pointer
-              rounded-lg
-              bg-mainBackgroundColor
-              border-2
-              border-columnBackgroundColor
-              p-4
-              ring-rose-500
-              hover:ring-2
-              flex
-              gap-2
-            "
-          >
-            <PlusIcon />
-            Add Column
-          </button>
+          <AddColumnButton createNewColumn={createNewColumn}/>
         </div>
 
         {/* {createPortal(
           <DragOverlay>
 
             {activeColumn && (
-              <ColumnContainer
+              <SortableColumn
                 column={activeColumn}
                 deleteColumn={deleteColumn}
                 updateColumn={updateColumn}
@@ -220,15 +245,7 @@ function KanbanBoard() {
     </div>
   );
 
-  function createTask(columnId: Id) {
-    const newTask: Task = {
-      id: generateId(),
-      columnId,
-      content: `Task ${tasks.length + 1}`,
-    };
 
-    setTasks([...tasks, newTask]);
-  }
 
   function deleteTask(id: Id) {
     const newTasks = tasks.filter((task) => task.id !== id);
@@ -244,31 +261,7 @@ function KanbanBoard() {
     setTasks(newTasks);
   }
 
-  function createNewColumn() {
-    const columnToAdd: Column = {
-      id: generateId(),
-      title: `Column ${columns.length + 1}`,
-    };
 
-    setColumns([...columns, columnToAdd]);
-  }
-
-  function deleteColumn(id: Id) {
-    const filteredColumns = columns.filter((col) => col.id !== id);
-    setColumns(filteredColumns);
-
-    const newTasks = tasks.filter((t) => t.columnId !== id);
-    setTasks(newTasks);
-  }
-
-  function updateColumn(id: Id, title: string) {
-    const newColumns = columns.map((col) => {
-      if (col.id !== id) return col;
-      return { ...col, title };
-    });
-
-    setColumns(newColumns);
-  }
 
   function onDragStart(event: DragStartEvent) {
     if (event.active.data.current?.type === "Column") {
@@ -352,6 +345,28 @@ function KanbanBoard() {
     }
   }
 }
+
+
+const AddColumnButton = memo(({ createNewColumn }: { createNewColumn(): void }) => {
+  console.log('AddColumnButton')
+
+  return <button
+    onClick={() => { createNewColumn() }}
+    className="
+      h-[60px] w-[350px] min-w-[350px]
+      cursor-pointer rounded-lg
+      bg-mainBackgroundColor border-2 border-columnBackgroundColor
+      p-4
+      ring-rose-500
+      hover:ring-2
+      flex
+      gap-2
+    "
+  >
+    <PlusIcon />
+    Add Column
+  </button>
+})
 
 function generateId() {
   /* Generate a random number between 0 and 10000 */
