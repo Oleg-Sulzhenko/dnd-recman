@@ -67,6 +67,8 @@ function SortableTask (props: Props) {
         flex
         flex-col
         overflow-hidden
+        h-[100px] 
+        min-h-[100px] 
       "
     >
      <TaskCard task={task} updateTask={updateTask} deleteTask={deleteTask}/>

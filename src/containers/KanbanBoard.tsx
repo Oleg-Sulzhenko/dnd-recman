@@ -35,6 +35,7 @@ const defaultTasks: Task[] = [
     columnId: "todo",
     // content: "List admin APIs for dashboard",
     content: "Todo 1",
+    completed: true
   },
   {
     id: "2",
@@ -42,6 +43,7 @@ const defaultTasks: Task[] = [
     content:
       // "Develop user registration functionality with OTP delivered on SMS after email confirmation and phone number confirmation",
       "NO RENDER PLEASE",
+    completed: false
   },
   // {
   //   id: "3",
@@ -160,6 +162,7 @@ function KanbanBoard() {
         id: generateId(),
         columnId,
         content: `Task ${prevTasks.length + 1}`,
+        completed: false
       };
       return [...prevTasks, newTask]
     });

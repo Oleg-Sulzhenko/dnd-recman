@@ -44,7 +44,7 @@ const ColumnContainerMemoized = memo(({
       <ColumnTitle column={column} tasks={tasks} updateColumn={updateColumn}/>
 
       {/* Column Tasks container */}
-      <div className="flex flex-grow flex-col gap-4 p-2   overflow-y-auto">
+      <div className="flex flex-grow max-h-[334px] flex-col gap-4 p-2 overflow-x-hidden overflow-y-auto">
         {/* <SortableContext items={tasksIds}>
           {tasks.map((task) => (
             <TaskCard
