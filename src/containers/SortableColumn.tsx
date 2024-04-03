@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Column, Id, Task } from "../types";
-import ColumnContainer from "./ColumnContainer";
+import ColumnContainer from "../components/Column";
 import DraggableIcon from "../icons/DraggableIcon";
 import TrashIcon from "../icons/TrashIcon";
 

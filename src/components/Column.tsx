@@ -1,10 +1,9 @@
-import { useMemo, useState, memo } from "react";
-import { SortableContext } from "@dnd-kit/sortable";
-
+import { useState, memo } from "react";
 import { compareObjects } from '../utils/helpers'
 import { Column, Id, Task } from "../types";
 import PlusIcon from "../icons/PlusIcon";
-import TaskCard from "./TaskCard";
+import SortableTask from "../containers/SortableTask";
+
 
 interface Props {
   column: Column;
@@ -45,7 +44,7 @@ const ColumnContainerMemoized = memo(({
       <ColumnTitle column={column} tasks={tasks} updateColumn={updateColumn}/>
 
       {/* Column Tasks container */}
-      <div className="flex flex-grow flex-col gap-4 p-2 overflow-x-hidden overflow-y-auto">
+      <div className="flex flex-grow flex-col gap-4 p-2   overflow-y-auto">
         {/* <SortableContext items={tasksIds}>
           {tasks.map((task) => (
             <TaskCard
@@ -58,7 +57,7 @@ const ColumnContainerMemoized = memo(({
         </SortableContext> */}
 
         {tasks.map((task) => (
-          <TaskCard
+          <SortableTask
             key={task.id}
             task={task}
             deleteTask={deleteTask}

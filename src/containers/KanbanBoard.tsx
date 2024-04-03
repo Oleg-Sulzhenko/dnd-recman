@@ -14,10 +14,9 @@ import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 
 import PlusIcon from "../icons/PlusIcon";
 import { Column, Id, Task } from "../types";
-import SortableColumn  from "../components/SortableColumn";
-import ColumnContainer from "../components/ColumnContainer";
+import SortableColumn  from "./SortableColumn";
 import TaskCard from "../components/TaskCard";
-import useLocalStorage from "../hooks/useBoardData";
+// import useLocalStorage from "../hooks/useBoardData";
 
 const defaultCols: Column[] = [
   {
@@ -141,16 +140,17 @@ function KanbanBoard() {
       return newColumns;
     })
   }, []);
-  // *
+
   const deleteColumn = useCallback((id: Id) => {
     setColumns((prevColumns) => {
       const filteredColumns = prevColumns.filter((col) => col.id !== id);
       return filteredColumns;
     });
 
-    // !!!
-    // const newTasks = tasks.filter((t) => t.columnId !== id);
-    // setTasks(newTasks);
+    setTasks((prevTasks) => {
+      const newTasks = prevTasks.filter((t) => t.columnId !== id);
+      return newTasks;
+    });
   }, []);
 
   // Tasks:
@@ -235,7 +235,7 @@ function KanbanBoard() {
           <AddColumnButton createNewColumn={createNewColumn}/>
         </div>
 
-        {/* {createPortal(
+        {createPortal(
           <DragOverlay>
 
             {activeColumn && (
@@ -246,9 +246,7 @@ function KanbanBoard() {
                 createTask={createTask}
                 deleteTask={deleteTask}
                 updateTask={updateTask}
-                tasks={tasks.filter(
-                  (task) => task.columnId === activeColumn.id
-                )}
+                columnTasks={tasksByColumn[activeColumn.id]}
               />
             )}
 
@@ -262,7 +260,7 @@ function KanbanBoard() {
             
           </DragOverlay>,
           document.body
-        )} */}
+        )}
 
       </DndContext>
     </div>
