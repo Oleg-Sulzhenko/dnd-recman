@@ -1,15 +1,11 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Id, Task } from "../types";
+import { TaskCardProps } from "../types";
 import TaskCard from "../components/TaskCard";
 
-interface Props { 
-  task: Task;
-  updateTask: (id: Id, content: string) => void;
-  deleteTask: (id: Id) => void;
-}
-function SortableTask (props: Props) {
-  const { task, updateTask, deleteTask } = props;
+ 
+function SortableTask (props: TaskCardProps) {
+  const { task } = props;
 
   const {
     setNodeRef,
@@ -61,17 +57,9 @@ function SortableTask (props: Props) {
     <div ref={setNodeRef} style={style}
       {...attributes}
       {...listeners} 
-      className="
-        bg-columnBackgroundColor
-        rounded-md
-        flex
-        flex-col
-        overflow-hidden
-        h-[100px] 
-        min-h-[100px] 
-      "
+      className="flex flex-col"
     >
-     <TaskCard task={task} updateTask={updateTask} deleteTask={deleteTask}/>
+     <TaskCard {...props}/>
     </div>
   );
 }

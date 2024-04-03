@@ -1,8 +1,7 @@
-import { useMemo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Column, Id, Task } from "../types";
-import ColumnContainer from "../components/Column";
+import ColumnComponent from "../components/Column";
 import DraggableIcon from "../icons/DraggableIcon";
 import TrashIcon from "../icons/TrashIcon";
 
@@ -12,15 +11,12 @@ interface Props {
   updateColumn: (id: Id, title: string) => void;
 
   createTask: (columnId: Id) => void;
-  updateTask: (id: Id, content: string) => void;
+  updateTask: (id: Id, content: string, completed: boolean) => void;
   deleteTask: (id: Id) => void;
   columnTasks: Task[];
 }
 function SortableColumn (props: Props) {
-  const { 
-    column, deleteColumn, updateColumn, 
-    columnTasks, createTask, deleteTask, updateTask
-  } = props;
+  const { column, deleteColumn, columnTasks, ...restProps } = props;
 
   const { setNodeRef, listeners, transform, transition, attributes, isDragging } = useSortable({
     id: column.id,
@@ -28,7 +24,6 @@ function SortableColumn (props: Props) {
       type: "Column",
       column,
     },
-    // disabled: editMode,
   });
 
   const style = {
@@ -71,13 +66,16 @@ function SortableColumn (props: Props) {
         flex-col
         overflow-hidden
       "
-    >
+    > 
+      {/* Draggable Top */}
       <div {...listeners} {...attributes} 
         className="
+          bg-slate-800 
           flex justify-between items-center 
-          bg-slate-800 hover:bg-slate-700
           mb-1
           pr-1
+          hover:bg-slate-700
+          cursor-grab
         "
        >
         <DraggableIcon/>
@@ -96,17 +94,12 @@ function SortableColumn (props: Props) {
         </button>
       </div>
 
-      {/* Column Content */}
-      <ColumnContainer 
+      {/* Column Component */}
+      <ColumnComponent 
         column={column} 
-        updateColumn={updateColumn}
-        
-        createTask={createTask}
-        updateTask={updateTask}
-        deleteTask={deleteTask}
         tasks={columnTasks}
+        {...restProps}
       />
-
     </div>
   );
 }

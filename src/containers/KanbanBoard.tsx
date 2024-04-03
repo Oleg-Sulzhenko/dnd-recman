@@ -175,11 +175,11 @@ function KanbanBoard() {
     });
   }, []);
 
-  const updateTask = useCallback((id: Id, content: string) => {
+  const updateTask = useCallback((id: Id, content: string, completed: boolean) => {
     setTasks((prevTasks) => {
       const newTasks = prevTasks.map((task) => {
         if (task.id !== id) return task;
-        return { ...task, content };
+        return { ...task, content, completed };
       });
   
       return [...newTasks]
@@ -355,8 +355,6 @@ function KanbanBoard() {
 
 
 const AddColumnButton = memo(({ createNewColumn }: { createNewColumn(): void }) => {
-  console.log('AddColumnButton')
-
   return <button
     onClick={() => { createNewColumn() }}
     className="

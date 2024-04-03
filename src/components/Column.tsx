@@ -10,10 +10,10 @@ interface Props {
   updateColumn: (id: Id, title: string) => void;
   tasks: Task[];
   createTask: (columnId: Id) => void;
-  updateTask: (id: Id, content: string) => void;
+  updateTask: (id: Id, content: string, completed: boolean) => void;
   deleteTask: (id: Id) => void;
 }
-const ColumnContainerMemoized = memo(({
+const ColumnComponentMemoized = memo(({
   column,
   updateColumn,
   tasks,
@@ -47,8 +47,7 @@ const ColumnContainerMemoized = memo(({
       <div className="flex flex-grow max-h-[334px] flex-col gap-4 p-2 overflow-x-hidden overflow-y-auto">
         {/* <SortableContext items={tasksIds}>
           {tasks.map((task) => (
-            <TaskCard
-              key={task.id}
+            <TaskCard key={task.id}
               task={task}
               deleteTask={deleteTask}
               updateTask={updateTask}
@@ -57,8 +56,7 @@ const ColumnContainerMemoized = memo(({
         </SortableContext> */}
 
         {tasks.map((task) => (
-          <SortableTask
-            key={task.id}
+          <SortableTask key={task.id}
             task={task}
             deleteTask={deleteTask}
             updateTask={updateTask}
@@ -99,7 +97,6 @@ const ColumnTitle = ({ tasks, column, updateColumn }: ColumnTitleProps) => {
       bg-mainBackgroundColor
       text-md
       h-[60px]
-      cursor-grab
       rounded-md
       rounded-b-none
       p-3
@@ -135,7 +132,6 @@ const ColumnTitle = ({ tasks, column, updateColumn }: ColumnTitleProps) => {
 
   </div> 
 }
-
 const TaskCounter = ({ tasksCount }: { tasksCount: number }) => {
   return <div
     className="flex justify-center items-center
@@ -149,4 +145,4 @@ const TaskCounter = ({ tasksCount }: { tasksCount: number }) => {
   </div>
 }
 
-export default ColumnContainerMemoized;
+export default ColumnComponentMemoized;

@@ -1,15 +1,27 @@
-
-import type { Task } from "../../types";
-
 interface Props { 
   value: boolean;
-  onChange: (content: Partial<Task>) => void;
+  onChange: () => void;
 }
 const Checkbox = ({ value, onChange }: Props) => {
+
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   console.log('Checkbox chanfge: ', e)
+  //   e.stopPropagation()
+  //   onChange();
+  // }
+
   return (
-    <label>
-      <input type="checkbox" checked={value} onChange={onChange} />
-    </label>
+    <input id="bordered-checkbox-1" type="checkbox" name="bordered-checkbox" 
+      checked={value}
+      onChange={onChange} 
+      className="
+        w-4 h-4 
+        text-blue-600 
+        bg-gray-100 
+        border-gray-300 
+        rounded 
+      "
+    />
   );
 };
 

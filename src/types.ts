@@ -11,3 +11,9 @@ export type Task = {
   content: string;
   completed: boolean;
 };
+
+export type TaskCardProps = { 
+  task: Task;
+  updateTask: (id: Id, content: string, completed: boolean) => void;
+  deleteTask: (id: Id) => void;
+}
