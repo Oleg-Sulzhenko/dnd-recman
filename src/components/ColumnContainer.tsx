@@ -1,7 +1,7 @@
 import { useMemo, useState, memo } from "react";
 import { SortableContext } from "@dnd-kit/sortable";
 
-import TrashIcon from "../icons/TrashIcon";
+import { compareObjects } from '../utils/helpers'
 import { Column, Id, Task } from "../types";
 import PlusIcon from "../icons/PlusIcon";
 import TaskCard from "./TaskCard";
@@ -9,19 +9,19 @@ import TaskCard from "./TaskCard";
 interface Props {
   column: Column;
   updateColumn: (id: Id, title: string) => void;
-  // tasks: Task[];
-  // createTask: (columnId: Id) => void;
-  // updateTask: (id: Id, content: string) => void;
-  // deleteTask: (id: Id) => void;
+  tasks: Task[];
+  createTask: (columnId: Id) => void;
+  updateTask: (id: Id, content: string) => void;
+  deleteTask: (id: Id) => void;
 }
-const ColumnContainerMemoized = memo(function ColumnContainer({
+const ColumnContainerMemoized = memo(({
   column,
   updateColumn,
-  // tasks,
-  // createTask,
-  // updateTask,
-  // deleteTask,
-}: Props) {
+  tasks,
+  createTask,
+  updateTask,
+  deleteTask,
+}: Props) => {
 
   // const tasksIds = useMemo(() => {
   //   return tasks.map((task) => task.id);
@@ -42,8 +42,7 @@ const ColumnContainerMemoized = memo(function ColumnContainer({
       "
     >
       {/* Column title */}
-    {/* <ColumnTitle column={column} tasks={tasks} updateColumn={updateColumn}/> */}
-    <ColumnTitle column={column} updateColumn={updateColumn}/>
+      <ColumnTitle column={column} tasks={tasks} updateColumn={updateColumn}/>
 
       {/* Column Tasks container */}
       <div className="flex flex-grow flex-col gap-4 p-2 overflow-x-hidden overflow-y-auto">
@@ -58,38 +57,41 @@ const ColumnContainerMemoized = memo(function ColumnContainer({
           ))}
         </SortableContext> */}
 
-        {/* {tasks.map((task) => (
-          <TaskCardOptimized
+        {tasks.map((task) => (
+          <TaskCard
             key={task.id}
             task={task}
             deleteTask={deleteTask}
             updateTask={updateTask}
           />
-        ))} */}
+        ))}
 
       </div>
 
       {/* Column footer */}
-      {/* <button
+      <button
         className="flex gap-2 items-center border-columnBackgroundColor border-2 rounded-md p-4 border-x-columnBackgroundColor hover:bg-mainBackgroundColor hover:text-rose-500 active:bg-black"
         onClick={() => { createTask(column.id) }}
       >
         <PlusIcon />
         Add task
-      </button> */}
+      </button>
     </div>
+  );
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.column === nextProps.column &&
+    compareObjects(prevProps.tasks, nextProps.tasks)
   );
 })
 
 
-
-
 interface ColumnTitleProps {
-  // tasks: Task[]
+  tasks: Task[]
   column: Column
   updateColumn: (id: Id, title: string) => void
 }
-const ColumnTitle = ({  column, updateColumn }: ColumnTitleProps) => {
+const ColumnTitle = ({ tasks, column, updateColumn }: ColumnTitleProps) => {
   const [editMode, setEditMode] = useState(false);
 
   return <div
@@ -111,7 +113,7 @@ const ColumnTitle = ({  column, updateColumn }: ColumnTitleProps) => {
     "
   >
     <div className="flex gap-2">
-      {/* <TaskCounter tasksCount={tasks?.length}/> */}
+      <TaskCounter tasksCount={tasks?.length}/>
 
       {!editMode && column.title}
       
@@ -144,7 +146,7 @@ const TaskCounter = ({ tasksCount }: { tasksCount: number }) => {
       rounded-full
     "
   >
-    {tasksCount}
+    {tasksCount || 0}
   </div>
 }
 

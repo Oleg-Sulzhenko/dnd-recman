@@ -11,16 +11,15 @@ interface Props {
   deleteColumn: (id: Id) => void;
   updateColumn: (id: Id, title: string) => void;
 
-  // createTask: (columnId: Id) => void;
-  // updateTask: (id: Id, content: string) => void;
-  // deleteTask: (id: Id) => void;
-  tasks: Task[];
+  createTask: (columnId: Id) => void;
+  updateTask: (id: Id, content: string) => void;
+  deleteTask: (id: Id) => void;
+  columnTasks: Task[];
 }
 function SortableColumn (props: Props) {
   const { 
     column, deleteColumn, updateColumn, 
-    tasks, 
-    // createTask, deleteTask, updateTask
+    columnTasks, createTask, deleteTask, updateTask
   } = props;
 
   const { setNodeRef, listeners, transform, transition, attributes, isDragging } = useSortable({
@@ -36,18 +35,6 @@ function SortableColumn (props: Props) {
     transition,
     transform: CSS.Transform.toString(transform),
   };
-
-  const memoizedColumnContainer = useMemo(() => {
-    return <ColumnContainer 
-      column={column} 
-      updateColumn={updateColumn}
-      
-      // createTask={createTask}
-      // updateTask={updateTask}
-      // deleteTask={deleteTask}
-      // tasks={tasks.filter((task) => task.columnId === column.id)}
-    />;
-  }, [column, updateColumn, tasks]);
 
   if (isDragging) {
     return (
@@ -110,7 +97,15 @@ function SortableColumn (props: Props) {
       </div>
 
       {/* Column Content */}
-      { memoizedColumnContainer }
+      <ColumnContainer 
+        column={column} 
+        updateColumn={updateColumn}
+        
+        createTask={createTask}
+        updateTask={updateTask}
+        deleteTask={deleteTask}
+        tasks={columnTasks}
+      />
 
     </div>
   );

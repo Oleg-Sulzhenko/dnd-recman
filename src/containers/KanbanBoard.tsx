@@ -24,10 +24,6 @@ const defaultCols: Column[] = [
     id: "todo",
     title: "Todo",
   },
-  // {
-  //   id: "doing",
-  //   title: "Progress",
-  // },
   {
     id: "done",
     title: "NO RENDER PLEASE",
@@ -48,12 +44,11 @@ const defaultTasks: Task[] = [
       // "Develop user registration functionality with OTP delivered on SMS after email confirmation and phone number confirmation",
       "NO RENDER PLEASE",
   },
-  {
-    id: "3",
-    columnId: "doing",
-    // content: "Conduct security testing",
-    content: "Progress 1",
-  },
+  // {
+  //   id: "3",
+  //   columnId: "doing",
+  //   content: "Conduct security testing",
+  // },
   // {
   //   id: "4",
   //   columnId: "doing",
@@ -126,7 +121,7 @@ function KanbanBoard() {
     })
   );
 
-  
+  // Columns:
   const createNewColumn = useCallback(() => {
     setColumns((prevColumns) => {
       const columnToAdd: Column = {
@@ -146,7 +141,7 @@ function KanbanBoard() {
       return newColumns;
     })
   }, []);
-
+  // *
   const deleteColumn = useCallback((id: Id) => {
     setColumns((prevColumns) => {
       const filteredColumns = prevColumns.filter((col) => col.id !== id);
@@ -158,7 +153,7 @@ function KanbanBoard() {
     // setTasks(newTasks);
   }, []);
 
-
+  // Tasks:
   const createTask = useCallback((columnId: Id) => {
     setTasks((prevTasks) => {
       const newTask: Task = {
@@ -169,7 +164,35 @@ function KanbanBoard() {
       return [...prevTasks, newTask]
     });
   }, []);
- 
+
+  const deleteTask = useCallback((id: Id) => {
+    setTasks((prevTasks) => {
+      const newTasks = prevTasks.filter((task) => task.id !== id);
+      return [...newTasks]
+    });
+  }, []);
+
+  const updateTask = useCallback((id: Id, content: string) => {
+    setTasks((prevTasks) => {
+      const newTasks = prevTasks.map((task) => {
+        if (task.id !== id) return task;
+        return { ...task, content };
+      });
+  
+      return [...newTasks]
+    });
+  }, []);
+
+  const tasksByColumn = useMemo(() => {
+    const tasksByCol: { [key: string]: Task[] } = {};
+
+    columns.forEach((col) => {
+      const colTasks = tasks.filter((task) => task.columnId === col.id) || []
+      tasksByCol[col.id] = colTasks;
+    })
+
+    return tasksByCol;
+  }, [columns, tasks])
 
   return (
     <div
@@ -199,10 +222,10 @@ function KanbanBoard() {
                   column={col}
                   deleteColumn={deleteColumn}
                   updateColumn={updateColumn}
-                  // createTask={createTask}
-                  // deleteTask={deleteTask}
-                  // updateTask={updateTask}
-                  tasks={tasks.filter((task) => task.columnId === col.id)}
+                  createTask={createTask}
+                  updateTask={updateTask}
+                  deleteTask={deleteTask}
+                  columnTasks={tasksByColumn[col.id]}
                 />
               ))}
             </SortableContext>
@@ -245,24 +268,7 @@ function KanbanBoard() {
     </div>
   );
 
-
-
-  function deleteTask(id: Id) {
-    const newTasks = tasks.filter((task) => task.id !== id);
-    setTasks(newTasks);
-  }
-
-  function updateTask(id: Id, content: string) {
-    const newTasks = tasks.map((task) => {
-      if (task.id !== id) return task;
-      return { ...task, content };
-    });
-
-    setTasks(newTasks);
-  }
-
-
-
+  // DND handlers
   function onDragStart(event: DragStartEvent) {
     if (event.active.data.current?.type === "Column") {
       setActiveColumn(event.active.data.current.column as Column);
