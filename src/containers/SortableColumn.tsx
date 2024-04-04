@@ -1,6 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Column, Id, Task } from "../types";
+import { Column, Id, Task, TasksFilterOptions } from "../types";
 import ColumnComponent from "../components/Column";
 import DraggableIcon from "../icons/DraggableIcon";
 import TrashIcon from "../icons/TrashIcon";
@@ -14,6 +14,7 @@ interface Props {
   updateTask: (id: Id, content: string, completed: boolean) => void;
   deleteTask: (id: Id) => void;
   columnTasks: Task[];
+  filterOptions: TasksFilterOptions;
 }
 function SortableColumn (props: Props) {
   const { column, deleteColumn, columnTasks, ...restProps } = props;

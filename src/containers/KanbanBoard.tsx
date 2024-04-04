@@ -16,6 +16,7 @@ import PlusIcon from "../icons/PlusIcon";
 import { Column, Id, Task } from "../types";
 import SortableColumn  from "./SortableColumn";
 import TaskCard from "../components/TaskCard";
+import Radio from "../components/ui/Radio";
 // import useLocalStorage from "../hooks/useBoardData";
 
 const defaultCols: Column[] = [
@@ -41,20 +42,22 @@ const defaultTasks: Task[] = [
     id: "2",
     columnId: "done",
     content:
-      // "Develop user registration functionality with OTP delivered on SMS after email confirmation and phone number confirmation",
-      "NO RENDER PLEASE",
+      "Develop user registration functionality with OTP delivered on SMS after email confirmation and phone number confirmation",
+      // "NO RENDER PLEASE",
     completed: false
   },
-  // {
-  //   id: "3",
-  //   columnId: "doing",
-  //   content: "Conduct security testing",
-  // },
-  // {
-  //   id: "4",
-  //   columnId: "doing",
-  //   content: "Analyze competitors",
-  // },
+  {
+    id: "3",
+    columnId: "done",
+    content: "Conduct security testing",
+    completed: false
+  },
+  {
+    id: "4",
+    columnId: "done",
+    content: "Analyze competitors",
+    completed: true
+  },
   // {
   //   id: "5",
   //   columnId: "done",
@@ -113,6 +116,12 @@ function KanbanBoard() {
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
 
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+
+  const [completedOnly, setCompletedOnly] = useState<boolean>(false);
+  const [todoOnly, setTodoOnly] = useState<boolean>(false);
+  const filterOptions = useMemo(() => {
+    return { completedOnly, todoOnly }
+  }, [completedOnly, todoOnly])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -197,6 +206,15 @@ function KanbanBoard() {
     return tasksByCol;
   }, [columns, tasks])
 
+  const toggleCompletedOnly = () => {
+    setCompletedOnly((prev) => !prev);
+    setTodoOnly(false);
+  }
+  const toggleTodoOnly = () => {
+    setTodoOnly((prev) => !prev);
+    setCompletedOnly(false);
+  }
+
   return (
     <div
       className="
@@ -216,7 +234,20 @@ function KanbanBoard() {
         onDragEnd={onDragEnd}
         onDragOver={onDragOver}
       >
-        <div className="m-auto flex gap-4">
+        <div className="m-auto flex gap-4 relative">
+          
+          <span className="absolute left-1 top-[-40px]">
+            <Radio 
+              label="Completed only"
+              value={completedOnly} 
+              onChange={toggleCompletedOnly}
+             />
+            <Radio 
+              label="Todo only"
+              value={todoOnly} 
+              onChange={toggleTodoOnly}
+             />
+          </span>
 
           <div className="flex gap-4">
             <SortableContext items={columnsId}>
@@ -229,6 +260,7 @@ function KanbanBoard() {
                   updateTask={updateTask}
                   deleteTask={deleteTask}
                   columnTasks={tasksByColumn[col.id]}
+                  filterOptions={filterOptions} 
                 />
               ))}
             </SortableContext>
@@ -250,6 +282,7 @@ function KanbanBoard() {
                 deleteTask={deleteTask}
                 updateTask={updateTask}
                 columnTasks={tasksByColumn[activeColumn.id]}
+                filterOptions={filterOptions} 
               />
             )}
 

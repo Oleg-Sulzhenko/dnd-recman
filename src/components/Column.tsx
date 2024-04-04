@@ -1,17 +1,18 @@
-import { useState, memo } from "react";
+import { useState, memo, type ReactElement, useEffect } from "react";
 import { compareObjects } from '../utils/helpers'
-import { Column, Id, Task } from "../types";
+import { Column, Id, Task, TasksFilterOptions } from "../types";
 import PlusIcon from "../icons/PlusIcon";
 import SortableTask from "../containers/SortableTask";
 
 
 interface Props {
-  column: Column;
-  updateColumn: (id: Id, title: string) => void;
-  tasks: Task[];
-  createTask: (columnId: Id) => void;
-  updateTask: (id: Id, content: string, completed: boolean) => void;
-  deleteTask: (id: Id) => void;
+  column: Column
+  updateColumn: (id: Id, title: string) => void
+  tasks: Task[]
+  createTask: (columnId: Id) => void
+  updateTask: (id: Id, content: string, completed: boolean) => void
+  deleteTask: (id: Id) => void
+  filterOptions: TasksFilterOptions
 }
 const ColumnComponentMemoized = memo(({
   column,
@@ -20,11 +21,28 @@ const ColumnComponentMemoized = memo(({
   createTask,
   updateTask,
   deleteTask,
+  filterOptions
 }: Props) => {
 
-  // const tasksIds = useMemo(() => {
-  //   return tasks.map((task) => task.id);
-  // }, [tasks]);
+  const { completedOnly, todoOnly } = filterOptions;
+
+  const TasksListFilter = (task: Task): ReactElement | null => {
+    const sortableTask = <SortableTask key={task.id}
+      task={task}
+      deleteTask={deleteTask}
+      updateTask={updateTask}
+    />
+    if(completedOnly) {
+      if(task.completed) return sortableTask;
+    } 
+    if(todoOnly) {
+      if(!task.completed) return sortableTask;
+    } 
+    if(!completedOnly && !todoOnly) {
+      return sortableTask;
+    }
+    return null;
+  }
 
   console.log('[COL] ', column.title)
 
@@ -41,28 +59,16 @@ const ColumnComponentMemoized = memo(({
       "
     >
       {/* Column title */}
-      <ColumnTitle column={column} tasks={tasks} updateColumn={updateColumn}/>
+      <ColumnTitle 
+        column={column} 
+        tasks={tasks} 
+        updateColumn={updateColumn}
+        filterOptions={filterOptions}
+      />
 
       {/* Column Tasks container */}
       <div className="flex flex-grow max-h-[334px] flex-col gap-4 p-2 overflow-x-hidden overflow-y-auto">
-        {/* <SortableContext items={tasksIds}>
-          {tasks.map((task) => (
-            <TaskCard key={task.id}
-              task={task}
-              deleteTask={deleteTask}
-              updateTask={updateTask}
-            />
-          ))}
-        </SortableContext> */}
-
-        {tasks.map((task) => (
-          <SortableTask key={task.id}
-            task={task}
-            deleteTask={deleteTask}
-            updateTask={updateTask}
-          />
-        ))}
-
+        {tasks.map((task) => TasksListFilter(task))}
       </div>
 
       {/* Column footer */}
@@ -77,6 +83,7 @@ const ColumnComponentMemoized = memo(({
   );
 }, (prevProps, nextProps) => {
   return (
+    prevProps.filterOptions === nextProps.filterOptions &&
     prevProps.column === nextProps.column &&
     compareObjects(prevProps.tasks, nextProps.tasks)
   );
@@ -87,9 +94,26 @@ interface ColumnTitleProps {
   tasks: Task[]
   column: Column
   updateColumn: (id: Id, title: string) => void
+  filterOptions: TasksFilterOptions
 }
-const ColumnTitle = ({ tasks, column, updateColumn }: ColumnTitleProps) => {
+const ColumnTitle = ({ tasks, column, updateColumn, filterOptions }: ColumnTitleProps) => {
   const [editMode, setEditMode] = useState(false);
+  const [taskCount, setTaskCount] = useState<number>(0);
+
+  useEffect(() => {
+    if(filterOptions.completedOnly) {
+      setTaskCount(tasks.filter((task) => task.completed).length);
+      return;
+    } 
+    if(filterOptions.todoOnly) {
+      setTaskCount(tasks.filter((task) => !task.completed).length);
+      return;
+    } 
+    if(!filterOptions.todoOnly && !filterOptions.todoOnly) {
+      setTaskCount(tasks.length);
+      return;
+    } 
+  }, [tasks, filterOptions]);
 
   return <div
     onClick={() => { setEditMode(true) }}
@@ -109,13 +133,24 @@ const ColumnTitle = ({ tasks, column, updateColumn }: ColumnTitleProps) => {
     "
   >
     <div className="flex gap-2">
-      <TaskCounter tasksCount={tasks?.length}/>
+      <TaskCounter tasksCount={taskCount}/>
 
-      {!editMode && column.title}
+      {!editMode && <p className="
+        max-w-[286px]
+        whitespace-nowrap text-ellipsis overflow-hidden
+        leading-7
+      ">{column.title}</p>}
       
       {editMode && (
         <input
-          className="bg-black focus:border-rose-500 border rounded outline-none px-2"
+          className="
+            bg-black 
+            focus:border-rose-500 
+            border rounded 
+            outline-none 
+            px-2 
+            w-[272px]
+          "
           value={column.title}
           onChange={(e) => updateColumn(column.id, e.target.value)}
           autoFocus

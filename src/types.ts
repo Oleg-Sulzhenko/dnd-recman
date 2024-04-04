@@ -17,3 +17,8 @@ export type TaskCardProps = {
   updateTask: (id: Id, content: string, completed: boolean) => void;
   deleteTask: (id: Id) => void;
 }
+
+export type TasksFilterOptions = {
+  completedOnly: boolean;
+  todoOnly: boolean;
+}

@@ -15,8 +15,7 @@ const Checkbox = ({ value, onChange }: Props) => {
       checked={value}
       onChange={onChange} 
       className="
-        w-4 h-4 
-        text-blue-600 
+        w-5 h-5
         bg-gray-100 
         border-gray-300 
         rounded 
