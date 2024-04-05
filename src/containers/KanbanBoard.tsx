@@ -17,101 +17,18 @@ import { Column, Id, Task } from "../types";
 import SortableColumn  from "./SortableColumn";
 import TaskCard from "../components/TaskCard";
 import Radio from "../components/ui/Radio";
-// import useLocalStorage from "../hooks/useBoardData";
+import useLocalStorage from "../hooks/useLocalStorage";
+import { defaultCols, defaultTasks } from "../dummyData";
 
-const defaultCols: Column[] = [
-  {
-    id: "todo",
-    title: "Todo",
-  },
-  {
-    id: "done",
-    title: "NO RENDER PLEASE",
-  },
-];
-
-const defaultTasks: Task[] = [
-  {
-    id: "1",
-    columnId: "todo",
-    // content: "List admin APIs for dashboard",
-    content: "Todo 1",
-    completed: true
-  },
-  {
-    id: "2",
-    columnId: "done",
-    content:
-      "Develop user registration functionality with OTP delivered on SMS after email confirmation and phone number confirmation",
-      // "NO RENDER PLEASE",
-    completed: false
-  },
-  {
-    id: "3",
-    columnId: "done",
-    content: "Conduct security testing",
-    completed: false
-  },
-  {
-    id: "4",
-    columnId: "done",
-    content: "Analyze competitors",
-    completed: true
-  },
-  // {
-  //   id: "5",
-  //   columnId: "done",
-  //   content: "Create UI kit documentation",
-  // },
-  // {
-  //   id: "6",
-  //   columnId: "done",
-  //   content: "Dev meeting",
-  // },
-  // {
-  //   id: "7",
-  //   columnId: "done",
-  //   content: "Deliver dashboard prototype",
-  // },
-  // {
-  //   id: "8",
-  //   columnId: "todo",
-  //   content: "Optimize application performance",
-  // },
-  // {
-  //   id: "9",
-  //   columnId: "todo",
-  //   content: "Implement data validation",
-  // },
-  // {
-  //   id: "10",
-  //   columnId: "todo",
-  //   content: "Design database schema",
-  // },
-  // {
-  //   id: "11",
-  //   columnId: "todo",
-  //   content: "Integrate SSL web certificates into workflow",
-  // },
-  // {
-  //   id: "12",
-  //   columnId: "doing",
-  //   content: "Implement error logging and monitoring",
-  // },
-  // {
-  //   id: "13",
-  //   columnId: "doing",
-  //   content: "Design and implement responsive UI",
-  // },
-];
 
 function KanbanBoard() {
   console.log('<<<KANBAN>>>')
-  // const [columns, setColumns] = useLocalStorage('columns');
-  const [columns, setColumns] = useState<Column[]>(defaultCols);
+  const [columns, setColumns] = useLocalStorage<Column[]>('columns', defaultCols);
+  // const [columns, setColumns] = useState<Column[]>(defaultCols);
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
-  const [tasks, setTasks] = useState<Task[]>(defaultTasks);
+  const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', defaultTasks);
+  // const [tasks, setTasks] = useState<Task[]>(defaultTasks);
 
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
 
@@ -133,40 +50,40 @@ function KanbanBoard() {
 
   // Columns:
   const createNewColumn = useCallback(() => {
-    setColumns((prevColumns) => {
+    setColumns((prevColumns: Column[]) => {
       const columnToAdd: Column = {
         id: generateId(),
         title: `Column ${prevColumns.length + 1}`,
       };
       return [...prevColumns, columnToAdd]
     })
-  }, []);
+  }, [setColumns]);
   
   const updateColumn = useCallback((id: Id, title: string) => {
-    setColumns((prevColumns) => {
+    setColumns((prevColumns: Column[]) => {
       const newColumns = prevColumns.map((col) => {
         if (col.id !== id) return col;
         return { ...col, title };
       });
       return newColumns;
     })
-  }, []);
+  }, [setColumns]);
 
   const deleteColumn = useCallback((id: Id) => {
-    setColumns((prevColumns) => {
+    setColumns((prevColumns: Column[]) => {
       const filteredColumns = prevColumns.filter((col) => col.id !== id);
       return filteredColumns;
     });
 
-    setTasks((prevTasks) => {
+    setTasks((prevTasks: Task[]) => {
       const newTasks = prevTasks.filter((t) => t.columnId !== id);
       return newTasks;
     });
-  }, []);
+  }, [setColumns, setTasks]);
 
   // Tasks:
   const createTask = useCallback((columnId: Id) => {
-    setTasks((prevTasks) => {
+    setTasks((prevTasks: Task[]) => {
       const newTask: Task = {
         id: generateId(),
         columnId,
@@ -178,14 +95,14 @@ function KanbanBoard() {
   }, []);
 
   const deleteTask = useCallback((id: Id) => {
-    setTasks((prevTasks) => {
+    setTasks((prevTasks: Task[]) => {
       const newTasks = prevTasks.filter((task) => task.id !== id);
       return [...newTasks]
     });
   }, []);
 
   const updateTask = useCallback((id: Id, content: string, completed: boolean) => {
-    setTasks((prevTasks) => {
+    setTasks((prevTasks: Task[]) => {
       const newTasks = prevTasks.map((task) => {
         if (task.id !== id) return task;
         return { ...task, content, completed };
@@ -332,7 +249,7 @@ function KanbanBoard() {
 
     console.log("DRAG END");
 
-    setColumns((columns) => {
+    setColumns((columns: Column[]) => {
       const activeColumnIndex = columns.findIndex((col) => col.id === activeId);
 
       const overColumnIndex = columns.findIndex((col) => col.id === overId);
@@ -357,7 +274,7 @@ function KanbanBoard() {
 
     // Im dropping a Task over another Task
     if (isActiveATask && isOverATask) {
-      setTasks((tasks) => {
+      setTasks((tasks: Task[]) => {
         const activeIndex = tasks.findIndex((t) => t.id === activeId);
         const overIndex = tasks.findIndex((t) => t.id === overId);
 
@@ -375,7 +292,7 @@ function KanbanBoard() {
 
     // Im dropping a Task over a column
     if (isActiveATask && isOverAColumn) {
-      setTasks((tasks) => {
+      setTasks((tasks: Task[]) => {
         const activeIndex = tasks.findIndex((t) => t.id === activeId);
 
         tasks[activeIndex].columnId = overId;
